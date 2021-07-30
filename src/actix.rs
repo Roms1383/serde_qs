@@ -6,8 +6,10 @@ use crate::de::Config as QsConfig;
 use crate::error::Error as QsError;
 
 #[cfg(feature = "actix")]
+#[cfg(not(feature = "actix2"))]
 use actix_web;
 #[cfg(feature = "actix2")]
+#[cfg(not(feature = "actix"))]
 use actix_web2 as actix_web;
 
 use actix_web::dev::Payload;
@@ -33,11 +35,16 @@ impl ResponseError for QsError {
 /// ```rust
 /// # #[macro_use] extern crate serde_derive;
 /// # #[cfg(feature = "actix")]
+/// # #[cfg(not(feature = "actix2"))]
 /// # use actix_web;
 /// # #[cfg(feature = "actix2")]
+/// # #[cfg(not(feature = "actix"))]
 /// # use actix_web2 as actix_web;
 /// use actix_web::{web, App, HttpResponse};
 /// use serde_qs::actix::QsQuery;
+/// #[cfg(feature = "actix")]
+/// #[cfg(not(feature = "actix2"))]
+/// use actix_web::BaseHttpResponse;
 ///
 /// #[derive(Deserialize)]
 /// pub struct UsersFilter {
@@ -46,6 +53,13 @@ impl ResponseError for QsError {
 ///
 /// // Use `QsQuery` extractor for query information.
 /// // The correct request for this handler would be `/users?id[]=1124&id[]=88"`
+/// # #[cfg(feature = "actix")]
+/// # #[cfg(not(feature = "actix2"))]
+/// fn filter_users(info: QsQuery<UsersFilter>) -> HttpResponse {
+///     BaseHttpResponse::from(info.id.iter().map(|i| i.to_string()).collect::<Vec<String>>().join(", ")).into()
+/// }
+/// # #[cfg(feature = "actix2")]
+/// # #[cfg(not(feature = "actix"))]
 /// fn filter_users(info: QsQuery<UsersFilter>) -> HttpResponse {
 ///     info.id.iter().map(|i| i.to_string()).collect::<Vec<String>>().join(", ").into()
 /// }
@@ -131,12 +145,17 @@ where
 /// ```rust
 /// # #[macro_use] extern crate serde_derive;
 /// # #[cfg(feature = "actix")]
+/// # #[cfg(not(feature = "actix2"))]
 /// # use actix_web;
 /// # #[cfg(feature = "actix2")]
+/// # #[cfg(not(feature = "actix"))]
 /// # use actix_web2 as actix_web;
 /// use actix_web::{error, web, App, FromRequest, HttpResponse};
 /// use serde_qs::actix::QsQuery;
 /// use serde_qs::Config as QsConfig;
+/// #[cfg(feature = "actix")]
+/// #[cfg(not(feature = "actix2"))]
+/// use actix_web::BaseHttpResponse;
 ///
 /// #[derive(Deserialize)]
 /// struct Info {
@@ -144,6 +163,13 @@ where
 /// }
 ///
 /// /// deserialize `Info` from request's querystring
+/// # #[cfg(feature = "actix")]
+/// # #[cfg(not(feature = "actix2"))]
+/// fn index(info: QsQuery<Info>) -> HttpResponse {
+///     BaseHttpResponse::from(format!("Welcome {}!", info.username)).into()
+/// }
+/// # #[cfg(feature = "actix2")]
+/// # #[cfg(not(feature = "actix"))]
 /// fn index(info: QsQuery<Info>) -> HttpResponse {
 ///     format!("Welcome {}!", info.username).into()
 /// }
